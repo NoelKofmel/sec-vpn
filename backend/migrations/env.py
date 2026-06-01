@@ -9,7 +9,7 @@ from app.core.config import settings
 from app.core.database import Base
 
 # Import all models here so Alembic can detect schema changes
-# from app.models import user, server  # uncomment as models are added
+from app.models import user as _user_module  # noqa: F401
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.database_url)

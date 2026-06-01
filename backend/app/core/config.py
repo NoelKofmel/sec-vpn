@@ -11,6 +11,9 @@ class Settings(BaseSettings):
     database_url: str
     redis_url: str = "redis://localhost:6379"
     secret_key: str = "dev-secret-change-in-production"
+    algorithm: str = "HS256"
+    access_token_expire_minutes: int = 15
+    refresh_token_expire_days: int = 30
     log_level: str = "INFO"
     debug: bool = False
 
