@@ -1,5 +1,5 @@
 from collections.abc import AsyncGenerator
-from typing import Annotated, TypeAlias
+from typing import Annotated
 
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import (
@@ -24,4 +24,4 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
         yield session
 
 
-DBSession: TypeAlias = Annotated[AsyncSession, Depends(get_session)]
+type DBSession = Annotated[AsyncSession, Depends(get_session)]
