@@ -2,6 +2,7 @@ import structlog
 from fastapi import APIRouter, HTTPException, Request, status
 
 from app.core.database import DBSession
+from app.core.dependencies import CurrentUser
 from app.core.exceptions import (
     EmailAlreadyExistsError,
     InvalidCredentialsError,
@@ -15,6 +16,7 @@ from app.schemas.auth import (
     RegisterRequest,
     TokenResponse,
 )
+from app.schemas.user import UserRead
 from app.services.auth_service import (
     authenticate_user,
     issue_tokens,
@@ -82,3 +84,8 @@ async def refresh(
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
 async def logout(body: RefreshRequest, redis: RedisClient) -> None:
     await revoke_refresh_token(body.refresh_token, redis)
+
+
+@router.get("/me", response_model=UserRead)
+async def me(current_user: CurrentUser) -> UserRead:
+    return UserRead.model_validate(current_user)

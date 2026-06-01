@@ -12,8 +12,15 @@ from sqlalchemy.ext.asyncio import (
 
 from app.core.config import settings
 from app.core.database import Base, get_session
+from app.core.limiter import limiter
 from app.core.redis import get_redis
 from app.main import app
+
+
+@pytest.fixture(autouse=True)
+def reset_rate_limits() -> None:
+    # All tests share the same loopback IP — reset counters before each test
+    limiter.reset()
 
 
 @pytest.fixture(scope="session")
