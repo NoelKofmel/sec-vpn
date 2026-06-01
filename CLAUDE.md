@@ -210,40 +210,40 @@ chore(infra): upgrade terraform provider to 3.x
 
 ## Development Roadmap
 
-### Milestone 1 — Foundation (Week 1)
+### Milestone 1 — Foundation 
 - [ ] Repo scaffold: all directories, `.gitignore`, `pyproject.toml`s, `docker-compose.yml`
 - [ ] Docker Compose: PostgreSQL + Redis + backend skeleton
 - [ ] FastAPI app: health endpoint, structured logging, Pydantic Settings config
 - [ ] Alembic setup with initial migration
 - [ ] GitHub Actions: ruff, mypy, pytest on backend
 
-### Milestone 2 — Auth & User API (Week 2)
+### Milestone 2 — Auth & User API 
 - [ ] User registration, login, JWT access + refresh tokens
 - [ ] Password hashing (bcrypt), rate limiting (slowapi)
 - [ ] Token refresh and logout endpoints
 - [ ] Full test coverage for auth flows
 
-### Milestone 3 — Server Registry & Node Agent (Week 3)
+### Milestone 3 — Server Registry & Node Agent 
 - [ ] Server model: id, name, country, city, public_key, endpoint, status
 - [ ] Admin-only CRUD API for servers
 - [ ] Node agent: add/remove WireGuard peers via `wg` subprocess
 - [ ] mTLS between backend and node agents
 - [ ] Health check polling from backend to nodes
 
-### Milestone 4 — Peer Provisioning API (Week 4)
+### Milestone 4 — Peer Provisioning API 
 - [ ] `POST /v1/peers` — receives client pubkey, assigns IP, calls node agent, returns WireGuard config
 - [ ] `DELETE /v1/peers/{id}` — removes peer from node
 - [ ] `GET /v1/peers/config` — returns active WireGuard config block
 - [ ] IP pool management (assign from CIDR, reclaim on disconnect)
 
-### Milestone 5 — macOS Client Skeleton (Week 5–6)
+### Milestone 5 — macOS Client Skeleton 
 - [ ] Xcode project with two targets: `SecVPN` (menu bar app) + `SecVPNHelper` (XPC daemon)
 - [ ] `MenuBarExtra` SwiftUI popup: login screen, server list, connect/disconnect toggle, status indicator
 - [ ] `KeychainService` for JWT + WireGuard private key storage
 - [ ] `APIClient` with URLSession, token refresh middleware
 - [ ] `HelperToolProtocol` XPC interface defined and both targets wired up
 
-### Milestone 6 — Privileged Helper & Tunnel (Week 7–8)
+### Milestone 6 — Privileged Helper & Tunnel 
 - [ ] `SecVPNHelper` daemon: registers via `SMAppService`, runs as root
 - [ ] Helper executes `wg-quick up/down` with a validated config file path (no raw user input to shell)
 - [ ] Helper exposes `wg show` output back to main app for status polling
@@ -251,7 +251,7 @@ chore(infra): upgrade terraform provider to 3.x
 - [ ] Full connect/disconnect flow end-to-end
 - [ ] Error propagation from helper → main app via XPC reply
 
-### Milestone 7 — Multi-Server & Production Hardening (Week 9–10)
+### Milestone 7 — Multi-Server & Production Hardening 
 - [ ] Server picker UI (by country/latency)
 - [ ] Terraform module for VPN node provisioning (Hetzner Cloud)
 - [ ] Ansible playbook: WireGuard install + node agent deploy
