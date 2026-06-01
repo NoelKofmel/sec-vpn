@@ -3,6 +3,7 @@ from httpx import AsyncClient
 
 # ── helpers ──────────────────────────────────────────────────────────────────
 
+
 async def register_user(client: AsyncClient, email: str) -> dict:
     resp = await client.post(
         "/v1/auth/register",
@@ -13,6 +14,7 @@ async def register_user(client: AsyncClient, email: str) -> dict:
 
 
 # ── register ─────────────────────────────────────────────────────────────────
+
 
 @pytest.mark.asyncio
 async def test_register_success(client: AsyncClient) -> None:
@@ -40,6 +42,7 @@ async def test_register_password_too_short(client: AsyncClient) -> None:
 
 
 # ── login ────────────────────────────────────────────────────────────────────
+
 
 @pytest.mark.asyncio
 async def test_login_success(client: AsyncClient) -> None:
@@ -72,6 +75,7 @@ async def test_login_unknown_email(client: AsyncClient) -> None:
 
 
 # ── refresh ───────────────────────────────────────────────────────────────────
+
 
 @pytest.mark.asyncio
 async def test_refresh_token_rotation(client: AsyncClient) -> None:
@@ -113,6 +117,7 @@ async def test_refresh_with_access_token_rejected(client: AsyncClient) -> None:
 
 # ── logout ────────────────────────────────────────────────────────────────────
 
+
 @pytest.mark.asyncio
 async def test_logout(client: AsyncClient) -> None:
     data = await register_user(client, "logout@example.com")
@@ -127,6 +132,7 @@ async def test_logout(client: AsyncClient) -> None:
 
 
 # ── me ────────────────────────────────────────────────────────────────────────
+
 
 @pytest.mark.asyncio
 async def test_get_me_success(client: AsyncClient) -> None:
