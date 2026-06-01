@@ -10,6 +10,14 @@ SecVPN is a portfolio-grade WireGuard VPN application consisting of:
 
 > **No Apple Developer account required.** The client uses the subprocess + wireguard-tools pattern (Option B) rather than the Network Extension framework. The app is self-signed for local use only and is not distributed via the App Store.
 
+## Core Product Goals
+
+These are the non-negotiable user-facing requirements that all technical decisions must serve:
+
+1. **Multi-country server switching.** Users can select a VPN server from any available country and switch freely. Country and latency are first-class data on every server record.
+2. **Native macOS quality UI.** The menu bar popup must feel indistinguishable from a first-party Apple app. Apple HIG compliance is not optional — see the UI Design Philosophy section.
+3. **Extensible for AI-powered security features.** The architecture must leave clean extension points for future capabilities (e.g. DNS-level threat filtering, anomaly detection, traffic analysis). No decisions should permanently close off adding an AI layer later.
+
 ## Architecture Invariants
 
 These decisions are fixed and must not be reversed without an ADR:
@@ -90,6 +98,23 @@ Two targets:
 The helper is the **only** entry point for privileged operations. The main app communicates exclusively via a typed XPC protocol (`HelperToolProtocol`). No `AuthorizationExecuteWithPrivileges` — that API is deprecated.
 
 Feature folders under `SecVPN/Features/` follow the pattern: `FeatureName/FeatureNameView.swift`, `FeatureNameViewModel.swift`, `FeatureNameModel.swift`.
+
+### UI Design Philosophy
+
+The macOS client must meet Apple-quality design standards. A reviewer should not be able to distinguish it from a first-party Apple app.
+
+**Rules:**
+- Follow the [Apple Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/) strictly. When in doubt, check HIG first.
+- Use **SF Symbols** for all icons. Never ship custom icon assets where an SF Symbol exists.
+- Use **system colors** (`Color.primary`, `.secondary`, `.accentColor`) and semantic materials (`.regularMaterial`, `.thickMaterial`). No hardcoded hex colors unless part of an intentional brand accent.
+- Typography via system font only: `.title`, `.headline`, `.body`, `.caption`. No custom fonts.
+- Animations must feel native: use `.spring(response:dampingFraction:)` for interactive transitions, `.easeInOut` for state changes. Never use linear animations on UI elements.
+- The menu bar popup respects macOS light/dark mode automatically by using system colors throughout.
+- Spacing follows an **8pt grid** (8, 16, 24, 32…). No arbitrary padding values.
+- Interactive elements meet the 44×44pt minimum touch target.
+- Status indicators (connected / disconnected / connecting) use color + shape, never color alone (accessibility).
+
+**Reference apps** to match in feel: the macOS Wi-Fi menu, Control Center, and Spark Mail's menu bar popup.
 
 ### WireGuard Key Generation
 Without `WireGuardKit`, generate keys using `wg genkey` / `wg pubkey` via the helper tool, or use CryptoKit's Curve25519 directly:
@@ -238,10 +263,11 @@ chore(infra): upgrade terraform provider to 3.x
 
 ### Milestone 5 — macOS Client Skeleton 
 - [ ] Xcode project with two targets: `SecVPN` (menu bar app) + `SecVPNHelper` (XPC daemon)
-- [ ] `MenuBarExtra` SwiftUI popup: login screen, server list, connect/disconnect toggle, status indicator
+- [ ] `MenuBarExtra` SwiftUI popup: login screen, server list grouped by country, connect/disconnect toggle, status indicator
 - [ ] `KeychainService` for JWT + WireGuard private key storage
 - [ ] `APIClient` with URLSession, token refresh middleware
 - [ ] `HelperToolProtocol` XPC interface defined and both targets wired up
+- [ ] Design: Apple HIG compliant, SF Symbols, system colors, 8pt grid, dark/light mode
 
 ### Milestone 6 — Privileged Helper & Tunnel 
 - [ ] `SecVPNHelper` daemon: registers via `SMAppService`, runs as root
@@ -252,12 +278,22 @@ chore(infra): upgrade terraform provider to 3.x
 - [ ] Error propagation from helper → main app via XPC reply
 
 ### Milestone 7 — Multi-Server & Production Hardening 
-- [ ] Server picker UI (by country/latency)
+- [ ] Polished server picker: grouped by country with flag icons (SF Symbols or emoji), latency badge, sorted by ping
+- [ ] Seamless country switching: disconnect → reprovision peer on new node → reconnect, with animated status transitions
 - [ ] Terraform module for VPN node provisioning (Hetzner Cloud)
 - [ ] Ansible playbook: WireGuard install + node agent deploy
 - [ ] Sentry error reporting in backend and client
 - [ ] Certificate pinning in `APIClient`
 - [ ] README with architecture diagram, screenshots, setup guide
+
+### Milestone 8 — AI Security Layer (Future)
+The exact features are TBD, but the architecture must support adding an AI-powered security layer without major refactoring. Candidate features:
+- DNS-level threat filtering (block malicious domains via node-agent DNS resolver)
+- Traffic anomaly detection (backend-side, per-user baseline)
+- Threat intelligence feed integration
+- Smart server selection (route around high-risk exit nodes)
+
+**Design constraint for earlier milestones:** The node-agent's peer management API should be designed as a clean interface that an AI security module can sit in front of. The backend's user/session model should include extensible metadata fields for future behavioural signals.
 
 ---
 
