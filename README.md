@@ -2,7 +2,7 @@
 
 A portfolio-grade WireGuard VPN application built with a SwiftUI macOS menu bar client, a FastAPI backend, and a per-node agent architecture. Designed to demonstrate production-quality full-stack and systems engineering across Swift, Python, and infrastructure-as-code.
 
-> **Status:** Active development — Milestone 1 (foundation) complete, working towards a fully functional VPN client by Milestone 7.
+> **Status:** Active development — Milestone 2 complete, working towards a fully functional VPN client by Milestone 7.
 
 ## Architecture
 
@@ -67,6 +67,9 @@ pip install -e ".[dev]"
 # Copy and configure environment
 cp .env.example .env
 
+# Apply database migrations
+alembic upgrade head
+
 # Run tests
 pytest -v
 
@@ -79,9 +82,13 @@ With `DEBUG=true` in `.env`, the Swagger UI is available at `http://localhost:80
 ## Roadmap
 
 - [x] Milestone 1 — Repo scaffold, Docker Compose, FastAPI skeleton, CI pipeline
-- [ ] Milestone 2 — Auth: user registration, JWT access + refresh tokens
+- [x] Milestone 2 — Auth: user registration, JWT access + refresh tokens, `GET /auth/me`
 - [ ] Milestone 3 — Server registry, node agent, mTLS
 - [ ] Milestone 4 — Peer provisioning API, IP pool management
-- [ ] Milestone 5 — macOS client skeleton (menu bar UI, Keychain, API client)
+- [ ] Milestone 5 — macOS client skeleton (menu bar UI grouped by country, Keychain, API client)
 - [ ] Milestone 6 — Privileged XPC helper, WireGuard tunnel, end-to-end connect flow
-- [ ] Milestone 7 — Multi-server UI, Terraform/Ansible, production hardening
+- [ ] Milestone 7 — Multi-country server picker, Terraform/Ansible, production hardening
+
+## Planned Extensions
+
+Once the core VPN is complete, the architecture is designed to support a next-generation security layer, including DNS-level threat filtering, traffic anomaly detection, and smart server selection powered by threat intelligence feeds.
