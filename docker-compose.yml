@@ -34,6 +34,9 @@ services:
     environment:
       DATABASE_URL: postgresql+asyncpg://secvpn:secvpn_dev@postgres:5432/secvpn
       REDIS_URL: redis://redis:6379
+      MTLS_CA_CERT: /certs/ca.crt
+      MTLS_CLIENT_CERT: /certs/client.crt
+      MTLS_CLIENT_KEY: /certs/client.key
     depends_on:
       postgres:
         condition: service_healthy
@@ -41,7 +44,25 @@ services:
         condition: service_healthy
     volumes:
       - ./backend:/app
+      - ./certs:/certs:ro
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  node-agent:
+    build: ./node-agent
+    ports:
+      - "8001:8001"
+    environment:
+      WG_INTERFACE: wg0
+      LOG_LEVEL: INFO
+      MTLS_CA_CERT: /certs/ca.crt
+      MTLS_SERVER_CERT: /certs/server.crt
+      MTLS_SERVER_KEY: /certs/server.key
+    volumes:
+      - ./node-agent:/app
+      - ./certs:/certs:ro
+    cap_add:
+      - NET_ADMIN
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
 
 volumes:
   postgres_data:

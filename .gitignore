@@ -57,3 +57,4 @@ docker-compose.override.yml
 *.key
 *.crt
 *.p12
+certs/

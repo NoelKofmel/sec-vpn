@@ -1,3 +1,5 @@
+import asyncio
+import contextlib
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
@@ -5,17 +7,22 @@ from fastapi import FastAPI
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
-from app.api.v1 import auth, health
+from app.api.v1 import auth, health, servers
 from app.core.config import settings
 from app.core.database import engine
 from app.core.limiter import limiter
 from app.core.logging import setup_logging
+from app.services.health_poller import run_health_poller
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     setup_logging(settings.log_level)
+    poller_task = asyncio.create_task(run_health_poller())
     yield
+    poller_task.cancel()
+    with contextlib.suppress(asyncio.CancelledError):
+        await poller_task
     await engine.dispose()
 
 
@@ -32,3 +39,4 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)  # ty
 
 app.include_router(health.router, prefix="/v1")
 app.include_router(auth.router, prefix="/v1")
+app.include_router(servers.router, prefix="/v1")

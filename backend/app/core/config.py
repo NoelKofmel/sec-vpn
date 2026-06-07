@@ -16,6 +16,12 @@ class Settings(BaseSettings):
     refresh_token_expire_days: int = 30
     log_level: str = "INFO"
     debug: bool = False
+    # mTLS client credentials for backend→node-agent calls
+    mtls_ca_cert: str = "/certs/ca.crt"
+    mtls_client_cert: str = "/certs/client.crt"
+    mtls_client_key: str = "/certs/client.key"
+    # Health check interval in seconds
+    health_check_interval: int = 60
 
 
 settings = Settings()
